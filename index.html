@@ -3,80 +3,93 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Online System Modern</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-        
-        body { display: flex; background-color: #f8fafc; color: #334155; min-height: 100vh; }
-
-        /* Sidebar Styling */
-        .sidebar { width: 260px; background-color: #ffffff; border-right: 1px solid #e2e8f0; display: flex; flex-direction: column; }
-        
-        .sidebar-header { padding: 24px; font-weight: 700; color: #10b981; font-size: 1.2rem; border-bottom: 1px solid #f1f5f9; }
-
-        .menu-list { padding: 15px; list-style: none; }
-        
-        .menu-item { 
-            padding: 12px 16px; 
-            margin-bottom: 4px; 
-            border-radius: 8px; 
-            cursor: pointer; 
-            transition: all 0.3s;
-            font-weight: 500;
-            color: #64748b;
-        }
-
-        .menu-item:hover { background-color: #f0fdf4; color: #10b981; }
-        .menu-item.active { background-color: #10b981; color: white; }
-
-        /* Main Content */
-        .main-content { flex: 1; display: flex; flex-direction: column; }
-        
-        header { 
-            height: 70px; 
-            background: white; 
-            display: flex; 
-            align-items: center; 
-            padding: 0 30px; 
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05); 
-            font-weight: 600;
-        }
-
-        .content-area { padding: 30px; }
-        
-        .card { 
-            background: white; 
-            padding: 20px; 
-            border-radius: 12px; 
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            min-height: 400px;
-        }
-    </style>
+    <title>Web SMD 2026</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
     <div class="sidebar">
         <div class="sidebar-header">ONLINE SYSTEM</div>
         <ul class="menu-list">
-            <li class="menu-item active">Dashboard</li>
-            <li class="menu-item">Data Outlet</li>
-            <li class="menu-item"> <a href="sales.html">Sales</a></li>
-            <li class="menu-item">Budget</li>
-            <li class="menu-item">PM</li>
-            <li class="menu-item">Operasional</li>
-            <li class="menu-item">E-Document</li>
+            <li><a href="index.html" class="menu-item active">Dashboard</a></li>
+
+            <li class="menu-item-wrapper">
+                <a href="#" class="menu-item">Evaluasi Sales <span>›</span></a>
+                <ul class="submenu">
+                    <li><a href="sales-harian.html" class="submenu-item">Sales Harian</a></li>
+                    <li><a href="perbandingan-bin.html" class="submenu-item">Perbandingan 2 Bin</a></li>
+                    <li><a href="trend-sales.html" class="submenu-item">Trend Sales Unit</a></li>
+                    <li><a href="p3.html" class="submenu-item">P3</a></li>
+                </ul>
+            </li>
+
+            <li class="menu-item-wrapper">
+                <a href="#" class="menu-item">Administrasi <span>›</span></a>
+                <ul class="submenu">
+                    <li><a href="pk.html" class="submenu-item">PK</a></li>
+                    <li><a href="ccs.html" class="submenu-item">CCS</a></li>
+                    <li><a href="kmo.html" class="submenu-item">KMO</a></li>
+                    <li><a href="usi-oral.html" class="submenu-item">USI - Oral / Indeks</a></li>
+                    <li><a href="generik.html" class="submenu-item">Generik</a></li>
+                </ul>
+            </li>
+
+            <li class="menu-item-wrapper">
+                <a href="#" class="menu-item">Akun + Kunjungan <span>›</span></a>
+                <ul class="submenu">
+                    <li><a href="kunjungan-akun.html" class="submenu-item">Kunjungan (Akun)</a></li>
+                    <li><a href="tambah-alamat.html" class="submenu-item">Tambah Alamat ID</a></li>
+                    <li><a href="buat-alamat.html" class="submenu-item">Buat Alamat ID</a></li>
+                    <li><a href="tambah-outlet.html" class="submenu-item">Tambah Outlet ID</a></li>
+                </ul>
+            </li>
+
+            <li><a href="stok-distributor.html" class="menu-item">Stok Distributor</a></li>
+            <li><a href="hitung-sales.html" class="menu-item">Hitung Sales</a></li>
+            <li><a href="cuti.html" class="menu-item" style="color: #ef4444; font-weight: 700;">Cuti-Cuti !!!</a></li>
+            <li><a href="bku.html" class="menu-item">BKU</a></li>
         </ul>
     </div>
 
     <div class="main-content">
-        <header>Selamat Datang, Admin</header>
+        <header>
+            <span>Dashboard Utama</span>
+            <span style="font-size: 0.8rem; color: #94a3b8;">Welcome back, Admin</span>
+        </header>
+        
         <div class="content-area">
-            <div class="card">
-                <p style="color: #94a3b8;">Konten akan muncul di sini...</p>
+            <div class="card-browser">
+                <div class="browser-toolbar">
+                    <input type="text" id="urlInput" class="url-bar" placeholder="Masukkan alamat web (misal: wikipedia.org atau bing.com)...">
+                    <button class="btn-go" onclick="changePage()">Buka</button>
+                </div>
+                
+                <iframe src="https://www.bing.com" id="miniBrowserFrame"></iframe>
             </div>
         </div>
     </div>
 
+    <script>
+        function changePage() {
+            var input = document.getElementById('urlInput').value;
+            var frame = document.getElementById('miniBrowserFrame');
+            
+            if (input !== "") {
+                // Menambahkan https:// jika user lupa mengetik
+                if (!input.startsWith('http://') && !input.startsWith('https://')) {
+                    input = 'https://' + input;
+                }
+                frame.src = input;
+            }
+        }
+
+        // Memungkinkan menekan 'Enter' untuk browsing
+        document.getElementById("urlInput").addEventListener("keyup", function(event) {
+            if (event.key === "Enter") {
+                changePage();
+            }
+        });
+    </script>
 </body>
 </html>
