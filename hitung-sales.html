@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kalkulator Lapi - Nota Pro</title>
+    <title>Kalkulator Lapi - SP Pro</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
     <style>
         :root {
@@ -33,6 +33,9 @@
             padding: 15px;
             background: #f0f4f8;
             border-radius: 8px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
         }
 
         .product-row {
@@ -105,18 +108,19 @@
         }
 
         #printHeader { display: none; margin-bottom: 20px; border-bottom: 2px solid #333; padding-bottom: 10px; }
+        #printSignature { display: none; margin-top: 50px; text-align: right; }
 
         /* PRINT STYLES */
         @media print {
             body { background: white; margin: 0; padding: 0; }
             .container { box-shadow: none; border: none; max-width: 100%; }
             h1, .btn, .btn-add, .btn-calc, .btn-del, .product-row, .customer-section, 
-            label, #hargaType, #discountInput, .action-buttons, .summary-grid > div:not(.grand-total-box) {
+            label, #hargaType, #discountInput, .action-buttons, #typeSummary, .cn-box {
                 display: none !important;
             }
             .summary-grid { border: none; padding: 0; display: block; }
             .grand-total-box { text-align: right; border-top: 1px solid #000; margin-top: 20px; }
-            #printHeader { display: block; }
+            #printHeader, #printSignature { display: block; }
         }
     </style>
 </head>
@@ -124,19 +128,32 @@
 
 <div class="container">
     <div id="printHeader">
-        <h2 id="displayCustomerName" style="margin:0;">NOTA PEMESANAN</h2>
-        <p id="displayDate" style="margin:5px 0; color:#666;"></p>
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <div>
+                <h2 id="displayCustomerName" style="margin:0;">SP: -</h2>
+                <p id="displayDistributor" style="margin:5px 0; font-weight:bold;"></p>
+            </div>
+            <div style="text-align: right;">
+                <p id="displayNota" style="margin:0; font-weight:bold;"></p>
+                <p id="displayDate" style="margin:5px 0; color:#666;"></p>
+            </div>
+        </div>
     </div>
 
     <h1>Kalkulator Lapi</h1>
     
     <div class="customer-section">
-        <label>Nama Customer:</label>
-        <input type="text" id="customerName" placeholder="Masukkan nama pelanggan..." style="width:100%; padding:10px; border-radius:6px; border:1px solid #ddd; font-size:16px;">
+        <div>
+            <label>Nama Customer:</label>
+            <input type="text" id="customerName" placeholder="Nama pelanggan..." style="width:100%; padding:8px; border-radius:6px; border:1px solid #ddd;">
+        </div>
+        <div>
+            <label>Nama Distributor:</label>
+            <input type="text" id="distributorName" placeholder="Nama distributor..." style="width:100%; padding:8px; border-radius:6px; border:1px solid #ddd;">
+        </div>
     </div>
 
     <div id="productsContainer"></div>
-    
     <button class="btn btn-add" onclick="addProductRow()">+ Tambah Produk</button>
     
     <div style="display: flex; gap: 10px; margin-bottom: 15px;">
@@ -173,19 +190,26 @@
             <div id="typeSummary">
                 <div class="summary-item"><span>Oral:</span> <span id="sumOral">0</span></div>
                 <div class="summary-item"><span>Injeksi:</span> <span id="sumInjeksi">0</span></div>
-                <div class="summary-item"><span>Generik:</span> <span id="sumGenerik">0</span></div>
                 <div class="summary-item" style="color: var(--primary-color);"><span>BRANDED (O+I):</span> <span id="sumBranded">0</span></div>
                 <div class="summary-item"><span>FARMA:</span> <span id="sumFarma">0</span></div>
                 <div class="summary-item"><span>MEDIKA:</span> <span id="sumMedika">0</span></div>
+                <div class="summary-item cn-box" style="background: #fff3cd; padding: 5px; margin-top: 10px; border: 1px dashed #856404;">
+                    <span>CN (HNA - Disc):</span> <span id="sumCN">0</span>
+                </div>
             </div>
 
             <div class="grand-total-box">
-                <div style="font-weight: bold;font-size: 1.3em">TOTAL HNA: <span id="grandTotalHna">Rp 0</span></div>
+                <div style="font-weight: bold; font-size: 1.3em">TOTAL HNA: <span id="grandTotalHna">Rp 0</span></div>
                 <div style="color: #555;">+PPN 11%: <span id="totalPpn">Rp 0</span></div>
                 <div style="font-size: 1.3em; color: var(--primary-color); font-weight: 800; border-top: 2px solid #ddd; padding-top: 5px;">
-                    TOTAL NET : <span id="totalNet">Rp 0</span>
+                    TOTAL NET: <span id="totalNet">Rp 0</span>
                 </div>
             </div>
+        </div>
+
+        <div id="printSignature">
+            <p style="margin-bottom: 60px;">Hormat Kami,</p>
+            <p>( ____________________ )</p>
         </div>
         
         <div class="action-buttons">
@@ -205,6 +229,13 @@
         if (!str) return 0;
         let clean = str.replace(/\./g, '').replace(',', '.');
         return parseFloat(clean) || 0;
+    }
+
+    function generateNota() {
+        const now = new Date();
+        const datePart = now.getFullYear() + String(now.getMonth() + 1).padStart(2, '0') + String(now.getDate()).padStart(2, '0');
+        const timePart = String(now.getHours()).padStart(2, '0') + String(now.getMinutes()).padStart(2, '0');
+        return `SP-${datePart}-${timePart}`;
     }
 
     function loadData() {
@@ -261,7 +292,6 @@
                 tableHtml += `<tr><td>${p.type} - ${p.divisi}</td><td>${p.nama}</td><td>${qty}</td><td>${formatIDR(price)}</td><td>${formatIDR(lineHna)}</td></tr>`;
                 if (p.type.includes('ORAL')) totals.oral += lineHna;
                 if (p.type.includes('INJEKSI')) totals.injeksi += lineHna;
-                if (p.type.includes('GENERIK')) totals.generik += lineHna;
                 if (p.divisi === 'FARMA') totals.farma += lineHna;
                 if (p.divisi === 'MEDIKA') totals.medika += lineHna;
                 totals.grandHna += lineHna;
@@ -270,14 +300,17 @@
 
         const totalPpnVal = totals.grandHna * 1.11;
         const totalNetVal = totalPpnVal * (1 - (discPerc / 100));
+        // Hitung CN: HNA - Diskon Global
+        const totalCN = totals.grandHna * (1 - (discPerc / 100));
 
         $('#tableBody').html(tableHtml);
         $('#sumOral').text(formatIDR(totals.oral));
         $('#sumInjeksi').text(formatIDR(totals.injeksi));
-        $('#sumGenerik').text(formatIDR(totals.generik));
         $('#sumBranded').text(formatIDR(totals.oral + totals.injeksi));
         $('#sumFarma').text(formatIDR(totals.farma));
         $('#sumMedika').text(formatIDR(totals.medika));
+        $('#sumCN').text(formatIDR(totalCN));
+
         $('#grandTotalHna').text(formatIDR(totals.grandHna));
         $('#totalPpn').text(formatIDR(totalPpnVal));
         $('#totalNet').text(formatIDR(totalNetVal));
@@ -297,18 +330,17 @@
         });
         localStorage.setItem('lapi_history', JSON.stringify(history));
         localStorage.setItem('lapi_cust', $('#customerName').val());
+        localStorage.setItem('lapi_dist', $('#distributorName').val());
         localStorage.setItem('lapi_disc', $('#discountInput').val());
     }
 
     function loadHistory() {
+        $('#customerName').val(localStorage.getItem('lapi_cust') || "");
+        $('#distributorName').val(localStorage.getItem('lapi_dist') || "");
+        $('#discountInput').val(localStorage.getItem('lapi_disc') || "0");
         const saved = localStorage.getItem('lapi_history');
-        const savedCust = localStorage.getItem('lapi_cust');
-        const savedDisc = localStorage.getItem('lapi_disc');
-        if (savedCust) $('#customerName').val(savedCust);
-        if (savedDisc) $('#discountInput').val(savedDisc);
         if (saved) {
-            const history = JSON.parse(saved);
-            history.forEach(item => addProductRow(item.name, item.qty));
+            JSON.parse(saved).forEach(item => addProductRow(item.name, item.qty));
             calculate(false);
         } else {
             addProductRow();
@@ -316,17 +348,15 @@
     }
 
     function preparePrint() {
-        const name = $('#customerName').val() || "Pelanggan Umum";
-        $('#displayCustomerName').text("SP: " + name.toUpperCase());
+        $('#displayCustomerName').text("SP: " + ($('#customerName').val() || "UMUM").toUpperCase());
+        $('#displayDistributor').text("DISTRIBUTOR: " + ($('#distributorName').val() || "-").toUpperCase());
+        $('#displayNota').text("NO: " + generateNota());
         $('#displayDate').text("Tanggal: " + new Date().toLocaleDateString('id-ID'));
         window.print();
     }
 
     function resetAll() {
-        if (confirm("Hapus semua?")) {
-            localStorage.clear();
-            location.reload();
-        }
+        if (confirm("Hapus semua?")) { localStorage.clear(); location.reload(); }
     }
 
     $(document).ready(loadData);
