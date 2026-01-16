@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulator Lapi - Qty Control</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+    <style>
+        :root {
+            --primary-color: #0070c9;
+            --bg-color: #f5f7fa;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: var(--bg-color);
+            margin: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin: auto;
+        }
+
+        h1 { text-align: center; color: var(--primary-color); }
+
+        .product-row {
+            display: grid;
+            grid-template-columns: 3fr 1.2fr 0.5fr;
+            gap: 10px;
+            margin-bottom: 12px;
+            align-items: center;
+        }
+
+        /* Styling khusus untuk kolom QTY agar panah atas bawah nyaman ditekan */
+        .qty-input {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            width: 100%;
+            box-sizing: border-box;
+            font-size: 16px;
+            text-align: center;
+        }
+
+        /* Memastikan panah (spinners) terlihat jelas */
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { 
+            opacity: 1;
+            height: 30px;
+            cursor: pointer;
+        }
+
+        .btn {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .btn-add { background: #28a745; color: white; margin-bottom: 15px; }
+        .btn-calc { background: var(--primary-color); color: white; width: 100%; margin-top: 10px; }
+        .btn-del { background: #d9534f; color: white; }
+        .btn-reset { background: #6c757d; color: white; flex: 1; }
+        .btn-pdf { background: #17a2b8; color: white; flex: 1; }
+
+        .action-buttons { display: flex; gap: 10px; margin-top: 20px; }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 14px; }
+        th { background: #eeeeee; color: #333; padding: 12px; border: 1px solid #ddd; text-align: left; }
+        td { border: 1px solid #ddd; padding: 10px; }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+            padding: 20px;
+            background: #fff;
+            border: 2px solid var(--primary-color);
+            border-radius: 8px;
+        }
+
+        .summary-item { 
+            display: flex; 
+            justify-content: space-between; 
+            font-weight: bold; 
+            border-bottom: 1px solid #eee; 
+            padding: 8px 0; 
+        }
+
+        .grand-total-box {
+            grid-column: 1 / -1;
+            text-align: right;
+            padding-top: 15px;
+        }
+
+        .grand-total-box div { margin-bottom: 5px; font-size: 1.1em; }
+
+        .status-saved { font-size: 0.8em; color: #28a745; text-align: right; margin-top: 5px; display: none; }
+
+        @media print {
+            .btn, .btn-add, .btn-calc, .btn-del, .product-row, .status-saved, label, #hargaType, #discountInput, .action-buttons {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Kalkulator Lapi</h1>
+    
+    <div id="productsContainer"></div>
+    <div id="saveStatus" class="status-saved">Riwayat tersimpan otomatis!</div>
+    
+    <button class="btn btn-add" onclick="addProductRow()">+ Tambah Produk</button>
+    
+    <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+        <div style="flex: 1;">
+            <label>Jenis Harga:</label>
+            <select id="hargaType" style="padding: 8px; width: 100%; border-radius: 6px;">
+                <option value="hna">HNA (Box)</option>
+                <option value="harga_tab">Harga per Tab</option>
+            </select>
+        </div>
+        <div style="flex: 1;">
+            <label>Diskon (%):</label>
+            <input type="number" id="discountInput" value="0" min="0" max="100" style="padding: 8px; width: 100%; border-radius: 6px; box-sizing: border-box;">
+        </div>
+    </div>
+
+    <button class="btn btn-calc" onclick="calculate(true)">Hitung Rincian</button>
+    
+    <div id="resultsArea" style="display:none;">
+        <table>
+            <thead>
+                <tr>
+                    <th>Type - Divisi</th>
+                    <th>Nama Produk</th>
+                    <th>Qty</th>
+                    <th>HNA Satuan</th>
+                    <th>Total HNA</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+        </table>
+
+        <div class="summary-grid">
+            <div>
+                <div class="summary-item"><span>Oral:</span> <span id="sumOral">0</span></div>
+                <div class="summary-item"><span>Injeksi:</span> <span id="sumInjeksi">0</span></div>
+                <div class="summary-item"><span>Generik:</span> <span id="sumGenerik">0</span></div>
+                <div class="summary-item" style="color: var(--primary-color);"><span>BRANDED (O+I):</span> <span id="sumBranded">0</span></div>
+            </div>
+            <div>
+                <div class="summary-item"><span>DIVISI FARMA:</span> <span id="sumFarma">0</span></div>
+                <div class="summary-item"><span>DIVISI MEDIKA:</span> <span id="sumMedika">0</span></div>
+                <div class="summary-item"><span>DIVISI FARMED:</span> <span id="sumFarmed">0</span></div>
+            </div>
+            <div class="grand-total-box">
+                <div style="font-weight: bold;">TOTAL HNA: <span id="grandTotalHna">Rp 0</span></div>
+                <div style="color: #555;">Total + PPN 11%: <span id="totalPpn">Rp 0</span></div>
+                <div style="font-size: 1.3em; color: var(--primary-color); font-weight: 800; border-top: 2px solid #ddd; padding-top: 5px;">
+                    TOTAL NET: <span id="totalNet">Rp 0</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="action-buttons">
+            <button class="btn btn-pdf" onclick="window.print()">Simpan PDF</button>
+            <button class="btn btn-reset" onclick="resetAll()">Reset</button>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+
+<script>
+    let productDatabase = [];
+
+    function cleanNumber(str) {
+        if (!str) return 0;
+        let clean = str.replace(/\./g, '').replace(',', '.');
+        return parseFloat(clean) || 0;
+    }
+
+    function loadData() {
+        const url = "https://raw.githubusercontent.com/Wispher15/Websmd/refs/heads/main/Harganov25.csv";
+        fetch(url)
+            .then(response => response.text())
+            .then(data => {
+                const lines = data.split("\n").slice(1);
+                productDatabase = [];
+                lines.forEach(line => {
+                    const cols = line.split(",");
+                    if (cols.length >= 7) {
+                        productDatabase.push({
+                            kode: cols[0].trim(),
+                            nama: cols[1].trim(),
+                            hna: cleanNumber(cols[2]),
+                            isi: cols[3].trim(),
+                            harga_tab: cleanNumber(cols[4]),
+                            divisi: cols[5].trim().toUpperCase(),
+                            type: cols[6].trim().toUpperCase()
+                        });
+                    }
+                });
+                loadHistory();
+            });
+    }
+
+    function addProductRow(savedName = "", savedQty = 1) {
+        const id = Date.now() + Math.random();
+        const html = `
+            <div class="product-row" id="row-${id}">
+                <select class="product-select">
+                    <option value="">Cari Produk...</option>
+                    ${productDatabase.map(p => `<option value="${p.nama}" ${p.nama === savedName ? 'selected' : ''}>${p.nama} (${p.kode})</option>`).join('')}
+                </select>
+                <input type="number" class="qty-input" value="${savedQty}" min="1" step="1">
+                <button class="btn btn-del" onclick="removeRow(${id})">X</button>
+            </div>
+        `;
+        $('#productsContainer').append(html);
+        $('.product-select').last().select2();
+    }
+
+    function removeRow(id) { $(`#row-${id}`).remove(); }
+
+    function formatIDR(num) {
+        return "Rp " + Math.round(num).toLocaleString('id-ID');
+    }
+
+    function saveHistory() {
+        let history = [];
+        $('.product-row').each(function() {
+            const name = $(this).find('.product-select').val();
+            const qty = $(this).find('.qty-input').val();
+            if (name) history.push({ name, qty });
+        });
+        localStorage.setItem('lapi_history', JSON.stringify(history));
+        localStorage.setItem('lapi_type', $('#hargaType').val());
+        localStorage.setItem('lapi_disc', $('#discountInput').val());
+        $('#saveStatus').fadeIn().delay(1000).fadeOut();
+    }
+
+    function loadHistory() {
+        const saved = localStorage.getItem('lapi_history');
+        const savedType = localStorage.getItem('lapi_type');
+        const savedDisc = localStorage.getItem('lapi_disc');
+        if (saved) {
+            const history = JSON.parse(saved);
+            if (history.length > 0) {
+                history.forEach(item => addProductRow(item.name, item.qty));
+                if (savedType) $('#hargaType').val(savedType);
+                if (savedDisc) $('#discountInput').val(savedDisc);
+                calculate(false);
+                return;
+            }
+        }
+        addProductRow();
+    }
+
+    function resetAll() {
+        if (confirm("Hapus semua?")) {
+            localStorage.clear();
+            location.reload();
+        }
+    }
+
+    function calculate(isManual) {
+        let totals = { oral: 0, injeksi: 0, generik: 0, farma: 0, medika: 0, grandHna: 0 };
+        const hargaType = $('#hargaType').val();
+        const discPerc = parseFloat($('#discountInput').val()) || 0;
+        let tableHtml = '';
+
+        $('.product-row').each(function() {
+            const name = $(this).find('.product-select').val();
+            const qty = parseFloat($(this).find('.qty-input').val()) || 0;
+            const p = productDatabase.find(i => i.nama === name);
+
+            if (p && qty > 0) {
+                const price = (hargaType === 'hna') ? p.hna : p.harga_tab;
+                const lineHna = price * qty;
+
+                tableHtml += `
+                    <tr>
+                        <td>${p.type} - ${p.divisi}</td>
+                        <td>${p.nama}</td>
+                        <td>${qty}</td>
+                        <td>${formatIDR(price)}</td>
+                        <td>${formatIDR(lineHna)}</td>
+                    </tr>
+                `;
+
+                if (p.type.includes('ORAL')) totals.oral += lineHna;
+                if (p.type.includes('INJEKSI')) totals.injeksi += lineHna;
+                if (p.type.includes('GENERIK')) totals.generik += lineHna;
+                if (p.divisi === 'FARMA') totals.farma += lineHna;
+                if (p.divisi === 'MEDIKA') totals.medika += lineHna;
+                totals.grandHna += lineHna;
+            }
+        });
+
+        const totalPpnVal = totals.grandHna * 1.11;
+        const totalNetVal = totalPpnVal * (1 - (discPerc / 100));
+
+        $('#tableBody').html(tableHtml);
+        $('#sumOral').text(formatIDR(totals.oral));
+        $('#sumInjeksi').text(formatIDR(totals.injeksi));
+        $('#sumGenerik').text(formatIDR(totals.generik));
+        $('#sumBranded').text(formatIDR(totals.oral + totals.injeksi));
+        $('#sumFarma').text(formatIDR(totals.farma));
+        $('#sumMedika').text(formatIDR(totals.medika));
+        $('#sumFarmed').text(formatIDR(totals.farma + totals.medika));
+
+        $('#grandTotalHna').text(formatIDR(totals.grandHna));
+        $('#totalPpn').text(formatIDR(totalPpnVal));
+        $('#totalNet').text(formatIDR(totalNetVal));
+        
+        if (tableHtml !== "") {
+            $('#resultsArea').show();
+            if (isManual) {
+                saveHistory();
+                window.scrollTo(0, document.body.scrollHeight);
+            }
+        }
+    }
+
+    $(document).ready(loadData);
+</script>
+</body>
+</html>
