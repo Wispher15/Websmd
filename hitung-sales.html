@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kalkulator Lapi - Qty Control</title>
+    <title>Kalkulator Lapi - Nota Pro</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
     <style>
         :root {
@@ -28,6 +28,13 @@
 
         h1 { text-align: center; color: var(--primary-color); }
 
+        .customer-section {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f0f4f8;
+            border-radius: 8px;
+        }
+
         .product-row {
             display: grid;
             grid-template-columns: 3fr 1.2fr 0.5fr;
@@ -36,7 +43,6 @@
             align-items: center;
         }
 
-        /* Styling khusus untuk kolom QTY agar panah atas bawah nyaman ditekan */
         .qty-input {
             padding: 10px;
             border: 1px solid #ddd;
@@ -47,12 +53,10 @@
             text-align: center;
         }
 
-        /* Memastikan panah (spinners) terlihat jelas */
         input[type=number]::-webkit-inner-spin-button, 
         input[type=number]::-webkit-outer-spin-button { 
             opacity: 1;
             height: 30px;
-            cursor: pointer;
         }
 
         .btn {
@@ -100,38 +104,52 @@
             padding-top: 15px;
         }
 
-        .grand-total-box div { margin-bottom: 5px; font-size: 1.1em; }
+        #printHeader { display: none; margin-bottom: 20px; border-bottom: 2px solid #333; padding-bottom: 10px; }
 
-        .status-saved { font-size: 0.8em; color: #28a745; text-align: right; margin-top: 5px; display: none; }
-
+        /* PRINT STYLES */
         @media print {
-            .btn, .btn-add, .btn-calc, .btn-del, .product-row, .status-saved, label, #hargaType, #discountInput, .action-buttons {
+            body { background: white; margin: 0; padding: 0; }
+            .container { box-shadow: none; border: none; max-width: 100%; }
+            h1, .btn, .btn-add, .btn-calc, .btn-del, .product-row, .customer-section, 
+            label, #hargaType, #discountInput, .action-buttons, .summary-grid > div:not(.grand-total-box) {
                 display: none !important;
             }
+            .summary-grid { border: none; padding: 0; display: block; }
+            .grand-total-box { text-align: right; border-top: 1px solid #000; margin-top: 20px; }
+            #printHeader { display: block; }
         }
     </style>
 </head>
 <body>
 
 <div class="container">
+    <div id="printHeader">
+        <h2 id="displayCustomerName" style="margin:0;">NOTA PEMESANAN</h2>
+        <p id="displayDate" style="margin:5px 0; color:#666;"></p>
+    </div>
+
     <h1>Kalkulator Lapi</h1>
     
+    <div class="customer-section">
+        <label>Nama Customer:</label>
+        <input type="text" id="customerName" placeholder="Masukkan nama pelanggan..." style="width:100%; padding:10px; border-radius:6px; border:1px solid #ddd; font-size:16px;">
+    </div>
+
     <div id="productsContainer"></div>
-    <div id="saveStatus" class="status-saved">Riwayat tersimpan otomatis!</div>
     
     <button class="btn btn-add" onclick="addProductRow()">+ Tambah Produk</button>
     
     <div style="display: flex; gap: 10px; margin-bottom: 15px;">
         <div style="flex: 1;">
             <label>Jenis Harga:</label>
-            <select id="hargaType" style="padding: 8px; width: 100%; border-radius: 6px;">
+            <select id="hargaType" style="padding: 10px; width: 100%; border-radius: 6px;">
                 <option value="hna">HNA (Box)</option>
                 <option value="harga_tab">Harga per Tab</option>
             </select>
         </div>
         <div style="flex: 1;">
             <label>Diskon (%):</label>
-            <input type="number" id="discountInput" value="0" min="0" max="100" style="padding: 8px; width: 100%; border-radius: 6px; box-sizing: border-box;">
+            <input type="number" id="discountInput" value="0" min="0" max="100" style="padding: 10px; width: 100%; border-radius: 6px; box-sizing: border-box;">
         </div>
     </div>
 
@@ -152,17 +170,15 @@
         </table>
 
         <div class="summary-grid">
-            <div>
+            <div id="typeSummary">
                 <div class="summary-item"><span>Oral:</span> <span id="sumOral">0</span></div>
                 <div class="summary-item"><span>Injeksi:</span> <span id="sumInjeksi">0</span></div>
                 <div class="summary-item"><span>Generik:</span> <span id="sumGenerik">0</span></div>
                 <div class="summary-item" style="color: var(--primary-color);"><span>BRANDED (O+I):</span> <span id="sumBranded">0</span></div>
+                <div class="summary-item"><span>FARMA:</span> <span id="sumFarma">0</span></div>
+                <div class="summary-item"><span>MEDIKA:</span> <span id="sumMedika">0</span></div>
             </div>
-            <div>
-                <div class="summary-item"><span>DIVISI FARMA:</span> <span id="sumFarma">0</span></div>
-                <div class="summary-item"><span>DIVISI MEDIKA:</span> <span id="sumMedika">0</span></div>
-                <div class="summary-item"><span>DIVISI FARMED:</span> <span id="sumFarmed">0</span></div>
-            </div>
+
             <div class="grand-total-box">
                 <div style="font-weight: bold;">TOTAL HNA: <span id="grandTotalHna">Rp 0</span></div>
                 <div style="color: #555;">Total + PPN 11%: <span id="totalPpn">Rp 0</span></div>
@@ -173,7 +189,7 @@
         </div>
         
         <div class="action-buttons">
-            <button class="btn btn-pdf" onclick="window.print()">Simpan PDF</button>
+            <button class="btn btn-pdf" onclick="preparePrint()">Simpan PDF / Nota</button>
             <button class="btn btn-reset" onclick="resetAll()">Reset</button>
         </div>
     </div>
@@ -193,27 +209,20 @@
 
     function loadData() {
         const url = "https://raw.githubusercontent.com/Wispher15/Websmd/refs/heads/main/Harganov25.csv";
-        fetch(url)
-            .then(response => response.text())
-            .then(data => {
-                const lines = data.split("\n").slice(1);
-                productDatabase = [];
-                lines.forEach(line => {
-                    const cols = line.split(",");
-                    if (cols.length >= 7) {
-                        productDatabase.push({
-                            kode: cols[0].trim(),
-                            nama: cols[1].trim(),
-                            hna: cleanNumber(cols[2]),
-                            isi: cols[3].trim(),
-                            harga_tab: cleanNumber(cols[4]),
-                            divisi: cols[5].trim().toUpperCase(),
-                            type: cols[6].trim().toUpperCase()
-                        });
-                    }
-                });
-                loadHistory();
+        fetch(url).then(res => res.text()).then(data => {
+            const lines = data.split("\n").slice(1);
+            lines.forEach(line => {
+                const cols = line.split(",");
+                if (cols.length >= 7) {
+                    productDatabase.push({
+                        kode: cols[0].trim(), nama: cols[1].trim(), hna: cleanNumber(cols[2]),
+                        isi: cols[3].trim(), harga_tab: cleanNumber(cols[4]),
+                        divisi: cols[5].trim().toUpperCase(), type: cols[6].trim().toUpperCase()
+                    });
+                }
             });
+            loadHistory();
+        });
     }
 
     function addProductRow(savedName = "", savedQty = 1) {
@@ -222,9 +231,9 @@
             <div class="product-row" id="row-${id}">
                 <select class="product-select">
                     <option value="">Cari Produk...</option>
-                    ${productDatabase.map(p => `<option value="${p.nama}" ${p.nama === savedName ? 'selected' : ''}>${p.nama} (${p.kode})</option>`).join('')}
+                    ${productDatabase.map(p => `<option value="${p.nama}" ${p.nama === savedName ? 'selected' : ''}>${p.nama}</option>`).join('')}
                 </select>
-                <input type="number" class="qty-input" value="${savedQty}" min="1" step="1">
+                <input type="number" class="qty-input" value="${savedQty}" min="1">
                 <button class="btn btn-del" onclick="removeRow(${id})">X</button>
             </div>
         `;
@@ -233,47 +242,7 @@
     }
 
     function removeRow(id) { $(`#row-${id}`).remove(); }
-
-    function formatIDR(num) {
-        return "Rp " + Math.round(num).toLocaleString('id-ID');
-    }
-
-    function saveHistory() {
-        let history = [];
-        $('.product-row').each(function() {
-            const name = $(this).find('.product-select').val();
-            const qty = $(this).find('.qty-input').val();
-            if (name) history.push({ name, qty });
-        });
-        localStorage.setItem('lapi_history', JSON.stringify(history));
-        localStorage.setItem('lapi_type', $('#hargaType').val());
-        localStorage.setItem('lapi_disc', $('#discountInput').val());
-        $('#saveStatus').fadeIn().delay(1000).fadeOut();
-    }
-
-    function loadHistory() {
-        const saved = localStorage.getItem('lapi_history');
-        const savedType = localStorage.getItem('lapi_type');
-        const savedDisc = localStorage.getItem('lapi_disc');
-        if (saved) {
-            const history = JSON.parse(saved);
-            if (history.length > 0) {
-                history.forEach(item => addProductRow(item.name, item.qty));
-                if (savedType) $('#hargaType').val(savedType);
-                if (savedDisc) $('#discountInput').val(savedDisc);
-                calculate(false);
-                return;
-            }
-        }
-        addProductRow();
-    }
-
-    function resetAll() {
-        if (confirm("Hapus semua?")) {
-            localStorage.clear();
-            location.reload();
-        }
-    }
+    function formatIDR(num) { return "Rp " + Math.round(num).toLocaleString('id-ID'); }
 
     function calculate(isManual) {
         let totals = { oral: 0, injeksi: 0, generik: 0, farma: 0, medika: 0, grandHna: 0 };
@@ -289,17 +258,7 @@
             if (p && qty > 0) {
                 const price = (hargaType === 'hna') ? p.hna : p.harga_tab;
                 const lineHna = price * qty;
-
-                tableHtml += `
-                    <tr>
-                        <td>${p.type} - ${p.divisi}</td>
-                        <td>${p.nama}</td>
-                        <td>${qty}</td>
-                        <td>${formatIDR(price)}</td>
-                        <td>${formatIDR(lineHna)}</td>
-                    </tr>
-                `;
-
+                tableHtml += `<tr><td>${p.type} - ${p.divisi}</td><td>${p.nama}</td><td>${qty}</td><td>${formatIDR(price)}</td><td>${formatIDR(lineHna)}</td></tr>`;
                 if (p.type.includes('ORAL')) totals.oral += lineHna;
                 if (p.type.includes('INJEKSI')) totals.injeksi += lineHna;
                 if (p.type.includes('GENERIK')) totals.generik += lineHna;
@@ -319,18 +278,54 @@
         $('#sumBranded').text(formatIDR(totals.oral + totals.injeksi));
         $('#sumFarma').text(formatIDR(totals.farma));
         $('#sumMedika').text(formatIDR(totals.medika));
-        $('#sumFarmed').text(formatIDR(totals.farma + totals.medika));
-
         $('#grandTotalHna').text(formatIDR(totals.grandHna));
         $('#totalPpn').text(formatIDR(totalPpnVal));
         $('#totalNet').text(formatIDR(totalNetVal));
         
         if (tableHtml !== "") {
             $('#resultsArea').show();
-            if (isManual) {
-                saveHistory();
-                window.scrollTo(0, document.body.scrollHeight);
-            }
+            if (isManual) saveHistory();
+        }
+    }
+
+    function saveHistory() {
+        let history = [];
+        $('.product-row').each(function() {
+            const name = $(this).find('.product-select').val();
+            const qty = $(this).find('.qty-input').val();
+            if (name) history.push({ name, qty });
+        });
+        localStorage.setItem('lapi_history', JSON.stringify(history));
+        localStorage.setItem('lapi_cust', $('#customerName').val());
+        localStorage.setItem('lapi_disc', $('#discountInput').val());
+    }
+
+    function loadHistory() {
+        const saved = localStorage.getItem('lapi_history');
+        const savedCust = localStorage.getItem('lapi_cust');
+        const savedDisc = localStorage.getItem('lapi_disc');
+        if (savedCust) $('#customerName').val(savedCust);
+        if (savedDisc) $('#discountInput').val(savedDisc);
+        if (saved) {
+            const history = JSON.parse(saved);
+            history.forEach(item => addProductRow(item.name, item.qty));
+            calculate(false);
+        } else {
+            addProductRow();
+        }
+    }
+
+    function preparePrint() {
+        const name = $('#customerName').val() || "Pelanggan Umum";
+        $('#displayCustomerName').text("NOTA: " + name.toUpperCase());
+        $('#displayDate').text("Tanggal: " + new Date().toLocaleDateString('id-ID'));
+        window.print();
+    }
+
+    function resetAll() {
+        if (confirm("Hapus semua?")) {
+            localStorage.clear();
+            location.reload();
         }
     }
 
