@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kalkulator Lapi - SP Apoteker</title>
+    <title>Kalkulator Lapi - SP Apoteker v3</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
     <style>
         :root {
@@ -83,14 +83,13 @@
             border-radius: 8px;
         }
 
-        .summary-item { display: flex; justify-content: space-between; font-weight: bold; border-bottom: 1px solid #eee; padding: 8px 0; }
+        .summary-item { display: flex; justify-content: space-between; font-weight: bold; border-bottom: 1px solid #eee; padding: 6px 0; font-size: 0.9em; }
 
         .grand-total-box { grid-column: 1 / -1; text-align: right; padding-top: 15px; }
 
         #printHeader { display: none; margin-bottom: 20px; border-bottom: 2px solid #333; padding-bottom: 10px; }
         #printSignature { display: none; margin-top: 50px; text-align: right; }
 
-        /* PRINT STYLES */
         @media print {
             @page { margin: 1cm; }
             body { background: white; margin: 0; padding: 0; }
@@ -99,9 +98,7 @@
             label, #hargaType, #discountInput, .action-buttons, #typeSummary, .cn-box {
                 display: none !important;
             }
-            /* Hilangkan kolom Type-Divisi (kolom pertama) saat print */
             table th:nth-child(1), table td:nth-child(1) { display: none; }
-            
             .summary-grid { border: none; padding: 0; display: block; }
             .grand-total-box { text-align: right; border-top: 1px solid #000; margin-top: 20px; }
             #printHeader, #printSignature { display: block; }
@@ -178,9 +175,11 @@
             <div id="typeSummary">
                 <div class="summary-item"><span>Oral:</span> <span id="sumOral">0</span></div>
                 <div class="summary-item"><span>Injeksi:</span> <span id="sumInjeksi">0</span></div>
+                <div class="summary-item"><span>Generik:</span> <span id="sumGenerik">0</span></div>
                 <div class="summary-item" style="color: var(--primary-color);"><span>BRANDED (O+I):</span> <span id="sumBranded">0</span></div>
-                <div class="summary-item"><span>FARMA:</span> <span id="sumFarma">0</span></div>
+                <div class="summary-item"><span>FARMA (Pure):</span> <span id="sumFarmaPure">0</span></div>
                 <div class="summary-item"><span>MEDIKA:</span> <span id="sumMedika">0</span></div>
+                <div class="summary-item" style="border-top: 1px solid #ddd;"><span>DIVISI FARMED (F+M):</span> <span id="sumFarmed">0</span></div>
                 <div class="summary-item cn-box" style="background: #fff3cd; padding: 5px; margin-top: 10px; border: 1px dashed #856404;">
                     <span>CN (HNA x Disc):</span> <span id="sumCN">0</span>
                 </div>
@@ -222,9 +221,7 @@
 
     function generateNota() {
         const now = new Date();
-        const datePart = now.getFullYear() + String(now.getMonth() + 1).padStart(2, '0') + String(now.getDate()).padStart(2, '0');
-        const timePart = String(now.getHours()).padStart(2, '0') + String(now.getMinutes()).padStart(2, '0');
-        return `SP-${datePart}-${timePart}`;
+        return `SP-${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}-${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}`;
     }
 
     function loadData() {
@@ -260,7 +257,7 @@
     function formatIDR(num) { return "Rp " + Math.round(num).toLocaleString('id-ID'); }
 
     function calculate(isManual) {
-        let totals = { oral: 0, injeksi: 0, farma: 0, medika: 0, grandHna: 0 };
+        let totals = { oral: 0, injeksi: 0, generik: 0, farma: 0, medika: 0, farmaPure: 0, grandHna: 0 };
         const hargaType = $('#hargaType').val();
         const discPerc = parseFloat($('#discountInput').val()) || 0;
         let tableHtml = '';
@@ -274,24 +271,36 @@
                 const price = (hargaType === 'hna') ? p.hna : p.harga_tab;
                 const lineHna = price * qty;
                 tableHtml += `<tr><td>${p.type} - ${p.divisi}</td><td>${p.nama}</td><td>${qty}</td><td>${formatIDR(price)}</td><td>${formatIDR(lineHna)}</td></tr>`;
+                
+                // Kategori Dasar
                 if (p.type.includes('ORAL')) totals.oral += lineHna;
                 if (p.type.includes('INJEKSI')) totals.injeksi += lineHna;
-                if (p.divisi === 'FARMA') totals.farma += lineHna;
+                if (p.type.includes('GENERIK')) totals.generik += lineHna;
+                
+                // Logika Divisi
+                if (p.divisi === 'FARMA') {
+                    totals.farma += lineHna;
+                    // Farma Pure (Farma yang bukan Generik)
+                    if (!p.type.includes('GENERIK')) totals.farmaPure += lineHna;
+                }
                 if (p.divisi === 'MEDIKA') totals.medika += lineHna;
+                
                 totals.grandHna += lineHna;
             }
         });
 
         const totalPpnVal = totals.grandHna * 1.11;
         const totalNetVal = totalPpnVal * (1 - (discPerc / 100));
-        const valCN = totals.grandHna * (discPerc / 100); // CN = HNA * %Disc
+        const valCN = totals.grandHna * (discPerc / 100);
 
         $('#tableBody').html(tableHtml);
         $('#sumOral').text(formatIDR(totals.oral));
         $('#sumInjeksi').text(formatIDR(totals.injeksi));
+        $('#sumGenerik').text(formatIDR(totals.generik));
         $('#sumBranded').text(formatIDR(totals.oral + totals.injeksi));
-        $('#sumFarma').text(formatIDR(totals.farma));
+        $('#sumFarmaPure').text(formatIDR(totals.farmaPure));
         $('#sumMedika').text(formatIDR(totals.medika));
+        $('#sumFarmed').text(formatIDR(totals.farma + totals.medika));
         $('#sumCN').text(formatIDR(valCN));
         $('#grandTotalHna').text(formatIDR(totals.grandHna));
         $('#totalPpn').text(formatIDR(totalPpnVal));
