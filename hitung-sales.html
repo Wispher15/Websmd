@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kalkulator Lapi - SP Apoteker v3</title>
+    <title>Kalkulator Lapi - SP Pro Search</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
     <style>
         :root {
@@ -232,9 +232,13 @@
                 const cols = line.split(",");
                 if (cols.length >= 7) {
                     productDatabase.push({
-                        kode: cols[0].trim(), nama: cols[1].trim(), hna: cleanNumber(cols[2]),
-                        isi: cols[3].trim(), harga_tab: cleanNumber(cols[4]),
-                        divisi: cols[5].trim().toUpperCase(), type: cols[6].trim().toUpperCase()
+                        kode: cols[0].trim(), 
+                        nama: cols[1].trim(), 
+                        hna: cleanNumber(cols[2]),
+                        isi: cols[3].trim(), 
+                        harga_tab: cleanNumber(cols[4]),
+                        divisi: cols[5].trim().toUpperCase(), 
+                        type: cols[6].trim().toUpperCase()
                     });
                 }
             });
@@ -244,13 +248,33 @@
 
     function addProductRow(savedName = "", savedQty = 1) {
         const id = Date.now() + Math.random();
+        // Menampilkan Kode dan Nama di dalam label option agar terlihat saat mencari
+        const options = productDatabase.map(p => 
+            `<option value="${p.nama}" data-kode="${p.kode}" ${p.nama === savedName ? 'selected' : ''}>${p.kode} - ${p.nama}</option>`
+        ).join('');
+
         const html = `<div class="product-row" id="row-${id}">
-            <select class="product-select"><option value="">Cari Produk...</option>
-            ${productDatabase.map(p => `<option value="${p.nama}" ${p.nama === savedName ? 'selected' : ''}>${p.nama}</option>`).join('')}
+            <select class="product-select"><option value="">Cari Kode atau Nama...</option>
+            ${options}
             </select><input type="number" class="qty-input" value="${savedQty}" min="1">
             <button class="btn btn-del" onclick="removeRow(${id})">X</button></div>`;
+        
         $('#productsContainer').append(html);
-        $('.product-select').last().select2();
+        
+        // Inisialisasi Select2 dengan fitur pencarian teks kustom
+        $(`#row-${id} .product-select`).select2({
+            placeholder: "Cari Kode atau Nama...",
+            allowClear: true,
+            matcher: function(params, data) {
+                // Jika input pencarian kosong, kembalikan semua data
+                if ($.trim(params.term) === '') { return data; }
+                // Cari kecocokan di teks option (yang berisi Kode - Nama)
+                if (data.text.toUpperCase().indexOf(params.term.toUpperCase()) > -1) {
+                    return data;
+                }
+                return null;
+            }
+        });
     }
 
     function removeRow(id) { $(`#row-${id}`).remove(); }
@@ -272,19 +296,14 @@
                 const lineHna = price * qty;
                 tableHtml += `<tr><td>${p.type} - ${p.divisi}</td><td>${p.nama}</td><td>${qty}</td><td>${formatIDR(price)}</td><td>${formatIDR(lineHna)}</td></tr>`;
                 
-                // Kategori Dasar
                 if (p.type.includes('ORAL')) totals.oral += lineHna;
                 if (p.type.includes('INJEKSI')) totals.injeksi += lineHna;
                 if (p.type.includes('GENERIK')) totals.generik += lineHna;
-                
-                // Logika Divisi
                 if (p.divisi === 'FARMA') {
                     totals.farma += lineHna;
-                    // Farma Pure (Farma yang bukan Generik)
                     if (!p.type.includes('GENERIK')) totals.farmaPure += lineHna;
                 }
                 if (p.divisi === 'MEDIKA') totals.medika += lineHna;
-                
                 totals.grandHna += lineHna;
             }
         });
