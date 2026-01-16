@@ -317,7 +317,7 @@
 
     function preparePrint() {
         const name = $('#customerName').val() || "Pelanggan Umum";
-        $('#displayCustomerName').text("NOTA: " + name.toUpperCase());
+        $('#displayCustomerName').text("SP: " + name.toUpperCase());
         $('#displayDate').text("Tanggal: " + new Date().toLocaleDateString('id-ID'));
         window.print();
     }
