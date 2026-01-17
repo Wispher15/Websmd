@@ -69,7 +69,7 @@ class SideBar extends HTMLElement {
             <div style="padding: 20px; border-top: 1px solid #f1f5f9; margin-top: 30px;">
                 <p style="margin: 0; font-size: 0.65rem; color: #94a3b8;">&copy; 2026 ONLINE SYSTEM</p>
                 <p style="margin: 5px 0 0 0; font-size: 0.8rem; color: #64748b;">
-                    Created by <span style="color: #10b981; font-weight: 600;">Whisper</span>
+                    Created by <span style="color: #10b981; font-weight: 600;">Wispher</span>
                 </p>
             </div>
         </div>
