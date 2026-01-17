@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stok Distributor - Web SMD 2026</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <main-sidebar></main-sidebar>
+
+    <div class="main-content">
+        <header>
+            <div class="header-left">
+                <span>Data Stok Distributor</span>
+            </div>
+            <div class="search-container">
+                <input type="text" id="productFilter" class="url-bar" placeholder="Cari produk...">
+            </div>
+        </header>
+        
+        <div class="content-area">
+            <div class="card" style="margin-bottom: 25px;">
+                <div class="card-title-container">
+                    <h2 style="font-size: 1rem; color: #1e293b;">Data Barang Onhand</h2>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table id="onhandTable" class="modern-table">
+                        <thead>
+                            <tr>
+                                <th>Produk</th>
+                                <th>MPI</th>
+                                <th>Kalista</th>
+                                <th>Penta Valent</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title-container">
+                    <h2 style="font-size: 1rem; color: #1e293b;">Data GIT</h2>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table id="gitTable" class="modern-table">
+                        <thead>
+                            <tr>
+                                <th>Produk</th>
+                                <th>MPI</th>
+                                <th>Kalista</th>
+                                <th>Penta Valent</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="sidebar-element.js"></script>
+
+    <script>
+        let allData = [];
+
+        function loadCSV() {
+            fetch('https://raw.githubusercontent.com/TIMSMD24/DataSMD/main/stok.csv')
+                .then(response => response.text())
+                .then(data => {
+                    const rows = data.split('\n');
+                    for (let i = 1; i < rows.length; i++) {
+                        const cells = rows[i].split(',');
+                        if (cells.length === 4) allData.push(cells);
+                    }
+                    filterData();
+                })
+                .catch(error => console.error('Gagal memuat data CSV:', error));
+        }
+
+        function displayTables(filteredData) {
+            const onhandBody = document.querySelector('#onhandTable tbody');
+            const gitBody = document.querySelector('#gitTable tbody');
+            onhandBody.innerHTML = ''; 
+            gitBody.innerHTML = '';
+
+            const products = {};
+            filteredData.forEach(row => {
+                const [dist, product, onhand, git] = row;
+                if (!products[product]) {
+                    products[product] = {
+                        MPI: { onhand: 0, git: 0 }, KLP: { onhand: 0, git: 0 }, PVL: { onhand: 0, git: 0 }
+                    };
+                }
+                if(products[product][dist.trim()]) {
+                    products[product][dist.trim()].onhand = parseInt(onhand, 10) || 0;
+                    products[product][dist.trim()].git = parseInt(git, 10) || 0;
+                }
+            });
+
+            for (const product in products) {
+                const trO = document.createElement('tr');
+                const trG = document.createElement('tr');
+                
+                trO.innerHTML = `<td><strong>${product}</strong></td>`;
+                trG.innerHTML = `<td><strong>${product}</strong></td>`;
+
+                ['MPI', 'KLP', 'PVL'].forEach(dist => {
+                    const vo = products[product][dist].onhand;
+                    const vg = products[product][dist].git;
+                    
+                    trO.innerHTML += `<td class="${vo <= 0 ? 'low-stock' : ''}">${vo}</td>`;
+                    trG.innerHTML += `<td class="${vg <= 0 ? 'low-stock' : ''}">${vg}</td>`;
+                });
+
+                onhandBody.appendChild(trO);
+                gitBody.appendChild(trG);
+            }
+        }
+
+        function filterData() {
+            const input = document.getElementById('productFilter').value.toUpperCase();
+            const filtered = allData.filter(row => row[1].toUpperCase().includes(input));
+            displayTables(filtered);
+        }
+
+        document.getElementById('productFilter').addEventListener('input', filterData);
+        window.onload = loadCSV;
+    </script>
+</body>
+</html>
+
