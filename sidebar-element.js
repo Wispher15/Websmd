@@ -1,10 +1,10 @@
 class SideBar extends HTMLElement {
     connectedCallback() {
         this.innerHTML = `
-        <div class="sidebar" style="display: flex; flex-direction: column; height: 100vh;">
+        <div class="sidebar" style="display: flex; flex-direction: column; min-height: 100vh;">
             <div class="sidebar-header">ONLINE SYSTEM SAMARINDA</div>
             
-            <ul class="menu-list" style="flex: 1; overflow-y: auto;">
+            <ul class="menu-list" style="flex: 1;">
                 <li><a href="index.html" class="menu-item">Pengumuman!!</a></li>
 
                 <li class="menu-item-wrapper">
@@ -45,43 +45,36 @@ class SideBar extends HTMLElement {
                 <li><a href="ppf.html" class="menu-item">PPF 2026</a></li>
             </ul>
 
-            <div style="padding: 15px 20px; border-top: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.05); shrink: 0;">
-                <p style="margin: 0; font-size: 0.7rem; color: #94a3b8; opacity: 0.8;">&copy; 2026 Online System</p>
-                <p style="margin: 4px 0 0 0; font-size: 0.75rem; color: #94a3b8;">Created by <span style="color: #10b981; font-weight: 600;">Whisper</span></p>
+            <div style="padding: 20px; border-top: 1px solid rgba(255,255,255,0.1); margin-top: 20px;">
+                <p style="margin: 0; font-size: 0.7rem; color: #94a3b8; letter-spacing: 0.5px;">&copy; 2026 ONLINE SYSTEM</p>
+                <p style="margin: 5px 0 0 0; font-size: 0.8rem; color: #fff; font-weight: 500;">
+                    Created by <span style="color: #10b981;">Whisper</span>
+                </p>
             </div>
         </div>
         `;
 
-        this.setActiveMenu();
-        this.setupSubmenus(); // Tambahkan ini agar dropdown berfungsi lagi
+        this.init();
     }
 
-    setupSubmenus() {
-        // Logika agar dropdown menu bisa diklik setelah dirender
-        const wrappers = this.querySelectorAll('.menu-item-wrapper > .menu-item');
-        wrappers.forEach(item => {
-            item.addEventListener('click', (e) => {
+    init() {
+        // 1. Logika Klik Dropdown (Penting agar menu bisa dibuka)
+        const dropdowns = this.querySelectorAll('.menu-item-wrapper > .menu-item');
+        dropdowns.forEach(btn => {
+            btn.onclick = (e) => {
                 e.preventDefault();
-                const submenu = item.nextElementSibling;
-                if (submenu) {
-                    const isVisible = submenu.style.display === 'block';
-                    submenu.style.display = isVisible ? 'none' : 'block';
-                }
-            });
+                const sub = btn.nextElementSibling;
+                sub.style.display = (sub.style.display === 'block') ? 'none' : 'block';
+            };
         });
-    }
 
-    setActiveMenu() {
-        const path = window.location.pathname;
-        const currentPage = path.split("/").pop() || "index.html";
-        const links = this.querySelectorAll('a');
-        links.forEach(link => {
-            if (link.getAttribute('href') === currentPage) {
+        // 2. Logika Active Menu (Warna Hijau otomatis)
+        const current = window.location.pathname.split("/").pop() || "index.html";
+        this.querySelectorAll('a').forEach(link => {
+            if (link.getAttribute('href') === current) {
                 link.classList.add('active');
-                const parentSub = link.closest('.submenu');
-                if (parentSub) {
-                    parentSub.style.display = 'block';
-                }
+                const parent = link.closest('.submenu');
+                if (parent) parent.style.display = 'block';
             }
         });
     }
