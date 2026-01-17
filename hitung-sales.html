@@ -7,66 +7,59 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <style>
-        /* CSS KHUSUS PRINT - DIOPTIMASI UNTUK 1 LEMBAR */
+        /* CSS KHUSUS PRINT */
         @media print {
             @page { 
                 size: portrait;
-                margin: 0.5cm; /* Margin lebih kecil agar muat 1 lembar */
+                margin: 0.8cm; 
             }
-            body { background: white; font-family: Arial, sans-serif; font-size: 11pt; }
+            body { background: white; font-family: Arial, sans-serif; font-size: 10pt; }
             
-            /* Sembunyikan semua elemen UI */
-            .sidebar, .btn-add-modern, .calc-settings, .btn-go, .btn-del-mini, 
-            .action-buttons-modern, header, .customer-section-modern, h3,
-            .modern-table th:first-child, .modern-table td:first-child, /* Sembunyikan kolom Type-Divisi */
-            #typeSummary { /* Sembunyikan rincian divisi di samping */
-                display: none !important;
+            /* Sembunyikan elemen navigasi dan INPUT */
+            .sidebar, header, .customer-section-modern, 
+            .btn-add-modern, .calc-settings, .btn-go, 
+            .action-buttons-modern, h3,
+            #productsContainer, /* Menghilangkan seluruh area input produk saat print */
+            .modern-table th:first-child, .modern-table td:first-child,
+            #typeSummary { 
+                display: none !important; 
             }
 
             .main-content { margin: 0 !important; padding: 0 !important; width: 100%; }
-            .card { border: none !important; box-shadow: none !important; padding: 0 !important; width: 100%; }
+            .card { border: none !important; box-shadow: none !important; padding: 0 !important; margin-bottom: 0 !important; }
             .content-area { padding: 0 !important; }
 
-            /* Header SP */
+            /* Header Surat Pesanan */
             #printHeader { 
                 display: block !important; 
                 border-bottom: 2px solid #000; 
-                margin-bottom: 15px; 
-                padding-bottom: 5px;
+                margin-bottom: 20px; 
+                padding-bottom: 10px;
             }
 
-            /* Tabel Minimalis */
+            /* Tabel PDF */
             .modern-table { width: 100%; border-collapse: collapse !important; margin-top: 10px; }
             .modern-table th, .modern-table td { 
                 border: 1px solid #000 !important; 
-                padding: 6px 8px !important; 
+                padding: 8px !important; 
                 text-align: center;
+                color: #000 !important;
             }
-            .modern-table td:nth-child(2) { text-align: left; } /* Nama produk rata kiri */
+            .modern-table td:nth-child(2) { text-align: left; }
 
-            /* Ringkasan Total di Bawah Tabel */
+            /* Area Total */
             .summary-grid-modern { 
                 display: flex !important; 
-                justify-content: flex-end !important; /* Geser ke kanan */
-                margin-top: 10px;
-                border: none !important;
+                justify-content: flex-end !important; 
+                margin-top: 15px;
                 background: none !important;
+                border: none !important;
             }
-            
-            .grand-total-modern { 
-                width: 250px; 
-                text-align: right;
-            }
-            .grand-total-modern div { border-bottom: 1px solid #ddd; padding: 3px 0; }
-            .net-label { font-size: 14pt !important; font-weight: bold; border-top: 2px solid #000 !important; }
+            .grand-total-modern { width: 250px; text-align: right; }
+            .grand-total-modern div { padding: 4px 0; border-bottom: 1px solid #eee; }
+            .net-label { font-size: 14pt !important; font-weight: bold; border-top: 2px solid #000 !important; color: #000 !important; }
 
-            /* Tanda Tangan */
-            #printSignature { 
-                display: block !important; 
-                margin-top: 30px; 
-                text-align: right;
-                page-break-inside: avoid; /* Mencegah ttd terpotong ke hal 2 */
-            }
+            #printSignature { display: block !important; margin-top: 50px; text-align: right; }
         }
         
         #printHeader, #printSignature { display: none; }
@@ -88,12 +81,12 @@
             <div style="display: flex; justify-content: space-between; align-items: flex-end;">
                 <div>
                     <h2 style="margin:0;">SURAT PESANAN (SP)</h2>
-                    <p style="margin:2px 0;"><strong>Customer:</strong> <span id="displayCustomerName">-</span></p>
+                    <p style="margin:4px 0;"><strong>Customer:</strong> <span id="displayCustomerName">-</span></p>
                     <p style="margin:0;"><strong>Distributor:</strong> <span id="displayDistributor">-</span></p>
                 </div>
                 <div style="text-align: right;">
                     <p style="margin:0;"><strong>No:</strong> <span id="displayNota">-</span></p>
-                    <p style="margin:2px 0;"><strong>Tanggal:</strong> <span id="displayDate">-</span></p>
+                    <p style="margin:4px 0;"><strong>Tanggal:</strong> <span id="displayDate">-</span></p>
                 </div>
             </div>
         </div>
@@ -119,14 +112,15 @@
             </div>
 
             <div class="card" style="margin-bottom: 20px;">
+                <h3 style="margin-bottom: 15px; font-size: 1rem;">Daftar Input Produk</h3>
                 <div id="productsContainer"></div>
                 <button class="btn-add-modern" onclick="addProductRow()">+ Tambah Produk</button>
                 <div class="calc-settings">
                     <div class="input-group">
-                        <label>Harga</label>
+                        <label>Jenis Harga</label>
                         <select id="hargaType" class="url-bar">
                             <option value="hna">HNA (Box)</option>
-                            <option value="harga_tab">Eceran (Tab)</option>
+                            <option value="harga_tab">Eceran (Tab/Syp)</option>
                         </select>
                     </div>
                     <div class="input-group">
@@ -134,7 +128,7 @@
                         <input type="number" id="discountInput" class="url-bar" value="0">
                     </div>
                 </div>
-                <button class="btn-go" style="width: 100%; margin-top: 15px;" onclick="calculate(true)">Hitung</button>
+                <button class="btn-go" style="width: 100%; margin-top: 15px;" onclick="calculate(true)">Proses Hitung</button>
             </div>
 
             <div id="resultsArea" style="display:none;">
@@ -142,10 +136,11 @@
                     <table class="modern-table border-vertical">
                         <thead>
                             <tr>
-                                <th>Type-Div</th> <th>Nama Produk</th>
+                                <th>Type-Div</th>
+                                <th>Nama Produk</th>
                                 <th>Qty</th>
                                 <th>Harga</th>
-                                <th>Total</th>
+                                <th>Total HNA</th>
                             </tr>
                         </thead>
                         <tbody id="tableBody"></tbody>
@@ -154,23 +149,23 @@
                     <div class="summary-grid-modern">
                         <div id="typeSummary">
                             <div class="sum-line">Oral: <span id="sumOral">0</span></div>
-                            <div class="sum-line highlight">BRANDED: <span id="sumBranded">0</span></div>
+                            <div class="sum-line">Injeksi: <span id="sumInjeksi">0</span></div> <div class="sum-line highlight">BRANDED (O+I): <span id="sumBranded">0</span></div>
                             <div class="sum-line">Generik: <span id="sumGenerik">0</span></div>
                             <div class="sum-line">Farma Pure: <span id="sumFarmaPure">0</span></div>
                             <div class="sum-line">Medika: <span id="sumMedika">0</span></div>
-                            <div class="sum-line">Farmed: <span id="sumFarmed">0</span></div>
-                            <div class="sum-line" style="background:#fff3cd">CN: <span id="sumCN">0</span></div>
+                            <div class="sum-line" style="border-top:1px solid #ddd; margin-top:5px; padding-top:5px;">Farmed: <span id="sumFarmed">0</span></div>
+                            <div class="sum-line" style="background:#fff3cd; padding:4px; border-radius:4px; margin-top:5px;">CN (Disc): <span id="sumCN">0</span></div>
                         </div>
 
                         <div class="grand-total-modern">
                             <div>TOTAL HNA: <span id="grandTotalHna">0</span></div>
-                            <div>PPN 11%: <span id="totalPpn">0</span></div>
+                            <div>+PPN 11%: <span id="totalPpn">0</span></div>
                             <div class="net-label">TOTAL NET: <span id="totalNet">0</span></div>
                         </div>
                     </div>
 
                     <div id="printSignature">
-                        <p style="margin-bottom: 50px;">Hormat Kami,</p>
+                        <p style="margin-bottom: 60px;">Hormat Kami,</p>
                         <p><strong>( __________________________ )</strong></p>
                     </div>
 
@@ -248,6 +243,7 @@
 
             document.getElementById('tableBody').innerHTML = tableHtml;
             document.getElementById('sumOral').innerText = formatNumber(totals.oral);
+            document.getElementById('sumInjeksi').innerText = formatNumber(totals.inj); // Update Nilai Injeksi
             document.getElementById('sumBranded').innerText = formatNumber(totals.oral + totals.inj);
             document.getElementById('sumGenerik').innerText = formatNumber(totals.gen);
             document.getElementById('sumFarmaPure').innerText = formatNumber(totals.fp);
@@ -283,12 +279,12 @@
             document.getElementById('displayCustomerName').innerText = document.getElementById('customerName').value || "UMUM";
             document.getElementById('displayDistributor').innerText = document.getElementById('distributorSelect').value;
             const now = new Date();
-            document.getElementById('displayNota').innerText = `SP-${now.getTime()}`;
+            document.getElementById('displayNota').innerText = "SP-" + now.getTime().toString().slice(-6);
             document.getElementById('displayDate').innerText = now.toLocaleDateString('id-ID');
             window.print();
         }
 
-        function resetAll() { if (confirm("Reset?")) { localStorage.clear(); location.reload(); } }
+        function resetAll() { if (confirm("Hapus semua data?")) { localStorage.clear(); location.reload(); } }
         window.onload = loadData;
     </script>
 </body>
