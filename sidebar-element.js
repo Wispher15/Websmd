@@ -54,6 +54,7 @@ class SideBar extends HTMLElement {
                         <li><a href="http://103.135.49.43:8090/PengajuanLinkOutletCustomer/" target="_blank" class="submenu-item">Tambah Alamat ID</a></li>
                         <li><a href="http://103.135.49.43:8090/PengajuanCustomer/" target="_blank" class="submenu-item">Buat Alamat ID</a></li>
                         <li><a href="http://103.135.49.43:8090/PengajuanOutlet/" target="_blank" class="submenu-item">Tambah Outlet ID</a></li>
+                        <li><a href="http://103.135.49.43:8090/moutlet/" target="_blank" class="submenu-item">Tambah Outlet ID</a></li>
                     </ul>
                 </li>
 
@@ -62,6 +63,7 @@ class SideBar extends HTMLElement {
                 <li><a href="http://103.135.49.43:8090/cuti_onleave/sign-in.php" target="_blank" class="menu-item" style="color: #ef4444; font-weight: 700;">Cuti-Cuti !!!</a></li>
                 <li><a href="http://103.135.49.43:8090/rbkuccd/" target="_blank" class="menu-item">BKU</a></li>
                 <li><a href="ppf.html" class="menu-item">PPF 2026</a></li>
+                <li><a href="http://103.135.49.43:8090/NEWMENU/" class="menu-item">ONLINE PUSAT</a></li>
             </ul>
 
             <div style="padding: 20px; border-top: 1px solid #f1f5f9; margin-top: 30px;">
