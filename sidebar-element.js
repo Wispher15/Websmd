@@ -25,14 +25,20 @@ class SideBar extends HTMLElement {
                         <li class="menu-item-wrapper">
                             <a href="#" class="submenu-item dropdown-trigger" style="font-weight: 600; color: #10b981;">CCS Menu <span>›</span></a>
                             <ul class="submenu" style="display: none; background-color: #f8fafc; border-left: 2px solid #10b981;">
-                                <li><a href="bcs.html" class="submenu-item">Bcs</a></li>
-                                <li><a href="ccs-branded.html" class="submenu-item">Ccs branded</a></li>
-                                <li><a href="ccs-generik.html" class="submenu-item">Ccs generik</a></li>
+                                <li><a href="bcs.html" class="submenu-item">BCS</a></li>
+                                <li><a href="ccs-branded.html" class="submenu-item">CCS Branded</a></li>
+                                <li><a href="ccs-generik.html" class="submenu-item">CCS Generik</a></li>
                             </ul>
                         </li>
 
                         <li><a href="kmo.html" class="submenu-item">KMO</a></li>
-                        <li><a href="usi-oral.html" class="submenu-item">USI - Oral / Indeks</a></li>
+                        <li><a href="usi-oral.html" class="submenu-item">USI - Oral <span>›</span></a></li>
+                            <ul class="submenu" style="display: none; background-color: #f8fafc; border-left: 2px solid #10b981;">
+                                <li><a href="bcs.html" class="submenu-item">Rekap USI Rayon</a></li>
+                                <li><a href="ccs-branded.html" class="submenu-item">Buat USI Langsung</a></li>
+                                <li><a href="ccs-generik.html" class="submenu-item">Buat USPON</a></li>
+                                <li><a href="ccs-generik.html" class="submenu-item">HISTORY 3 PERIODE</a></li>
+                            </ul>
                         <li><a href="generik.html" class="submenu-item">Generik</a></li>
                     </ul>
                 </li>
