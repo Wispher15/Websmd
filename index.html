@@ -3,21 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Web SMD 2026</title>
-    <link href="[https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap](https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap)" rel="stylesheet">
+    <title>Dashboard Utama - Online System SMD</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <style>
-        /* Pengaturan agar video pas di area sidebar */
-        .video-container {
-            width: 100%;
-            height: 100%;
+        /* Desain Kontainer Video agar Responsif */
+        .video-wrapper {
+            position: relative;
+            padding-bottom: 56.25%; /* Rasio 16:9 */
+            height: 0;
             overflow: hidden;
+            border-radius: 12px;
             background: #000;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
         }
-        .video-container iframe {
+        .video-wrapper iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
             height: 100%;
             border: none;
+        }
+        .update-list {
+            margin-top: 15px;
+            padding-left: 20px;
+        }
+        .update-list li {
+            margin-bottom: 8px;
+            color: #475569;
         }
     </style>
 </head>
@@ -27,48 +41,46 @@
 
     <div class="main-content">
         <header>
-            <span>Dashboard Utama</span>
-            <span style="font-size: 0.8rem; color: #94a3b8;">PT. LAPI LABORATORIES</span>
+            <div class="header-left">
+                <span style="font-weight: 700; font-size: 1.1rem; color: #1e293b;">Dashboard Utama</span>
+            </div>
+            <div class="header-right">
+                <span style="font-size: 0.85rem; color: #64748b;">PT. LAPI LABORATORIES</span>
+            </div>
         </header>
         
-        <div class="content-area" style="display: flex; gap: 20px; flex-wrap: wrap;">
-            
-            <div style="flex: 2; min-width: 300px;">
-                <div class="card">
-                    <h2>Selamat Datang</h2>
-                    <p>Sistem Informasi Sales & Stok Online SMD 2026. Pilih menu di samping untuk mulai bekerja.</p>
-                </div>
+        <div class="content-area">
+            <div class="card" style="margin-bottom: 20px;">
+                <h2 style="color: #0f172a; margin-bottom: 10px;">Selamat Datang</h2>
+                <p style="color: #475569; line-height: 1.6;">
+                    Sistem Informasi Sales & Stok Online SMD 2026. Pilih menu di samping untuk mulai bekerja.
+                </p>
                 
-                <div class="card" style="margin-top: 20px;">
-                    <h3>Update Terbaru</h3>
-                    <ul>
-                        <li>Data Stok diperbarui setiap jam 08.00 pagi.</li>
-                        <li>Fitur Print SP di halaman Hitung Sales sudah aktif.</li>
-                    </ul>
-                </div>
+                <h3 style="font-size: 1rem; margin-top: 20px; color: #1e293b;">Update Terbaru:</h3>
+                <ul class="update-list">
+                    <li>Data Stok diperbarui setiap jam 08.00 pagi.</li>
+                    <li>Fitur Print SP di halaman Hitung Sales sudah aktif.</li>
+                    <li>Sistem navigasi kini menggunakan Master Sidebar (sidebar-element.js).</li>
+                </ul>
             </div>
 
-            <div style="flex: 1; min-width: 300px;">
-                <div class="card" style="padding: 10px; height: 400px;">
-                    <h3 style="margin-bottom: 10px; font-size: 0.9rem;">Company Profile</h3>
-                    <div class="video-container">
-                        <iframe 
-                            src="[https://www.youtube.com/embed/KEziBj0M_-E?si=UAE-MC5OkUdfPDnv](https://www.youtube.com/embed/KEziBj0M_-E?si=UAE-MC5OkUdfPDnv)" 
-                            title="PT LAPI Company Profile" 
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-                            allowfullscreen>
-                        </iframe>
-                    </div>
-                    <p style="font-size: 0.75rem; margin-top: 10px; color: #64748b;">
-                        Video Company Profile PT. LAPI LABORATORIES.
-                    </p>
+            <div class="card">
+                <h3 style="font-size: 1rem; margin-bottom: 15px; color: #1e293b;">Company Profile</h3>
+                <div class="video-wrapper">
+                    <iframe 
+                        src="https://www.youtube.com/embed/KEziBj0M_-E" 
+                        title="PT LAPI Company Profile" 
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                        allowfullscreen>
+                    </iframe>
                 </div>
+                <p style="font-size: 0.8rem; margin-top: 15px; color: #94a3b8; font-style: italic;">
+                    Video Company Profile PT. LAPI LABORATORIES.
+                </p>
             </div>
-
         </div>
     </div>
 
     <script src="sidebar-element.js"></script>
-
 </body>
 </html>
