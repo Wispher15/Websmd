@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Online SMD</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .iframe-container {
+            width: 100%;
+            height: calc(100vh - 70px); /* Mengurangi tinggi header */
+            border: none;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #fff;
+        }
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+    <main-sidebar></main-sidebar>
+
+    <div class="main-content">
+        <header>
+            <span id="page-title">Memuat Halaman...</span>
+        </header>
+        
+        <div class="content-area" style="padding: 10px;">
+            <div class="iframe-container">
+                <iframe id="main-frame" src=""></iframe>
+            </div>
+        </div>
+    </div>
+
+    <script src="sidebar-element.js"></script>
+    <script>
+        // Mengambil URL dari parameter link di browser
+        const params = new URLSearchParams(window.location.search);
+        const targetUrl = params.get('url');
+        const title = params.get('title');
+
+        if (targetUrl) {
+            document.getElementById('main-frame').src = targetUrl;
+        }
+        if (title) {
+            document.getElementById('page-title').innerText = decodeURIComponent(title);
+        }
+    </script>
+</body>
+</html>
