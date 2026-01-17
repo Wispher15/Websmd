@@ -9,8 +9,7 @@ class SideBar extends HTMLElement {
 
                 <li class="menu-item-wrapper">
                     <a href="#" class="menu-item dropdown-trigger">Evaluasi Sales <span>›</span></a>
-                    <ul class="submenu" style="display: none;">
-                        <li><a href="sales-harian.html" class="submenu-item">Sales Harian</a></li>
+                    <ul class="submenu" style="display: none; background-color: #1e293b;"> <li><a href="sales-harian.html" class="submenu-item">Sales Harian</a></li>
                         <li><a href="perbandingan-bin.html" class="submenu-item">Perbandingan 2 Bin</a></li>
                         <li><a href="trend-sales.html" class="submenu-item">Trend Sales Unit</a></li>
                         <li><a href="p3.html" class="submenu-item">P3</a></li>
@@ -19,16 +18,16 @@ class SideBar extends HTMLElement {
 
                 <li class="menu-item-wrapper">
                     <a href="#" class="menu-item dropdown-trigger">Administrasi <span>›</span></a>
-                    <ul class="submenu" style="display: none;">
-                        <li><a href="pk.html" class="submenu-item">PK</a></li>
-                        <li class="menu-item-wrapper" style="padding-left: 10px; border-left: 1px solid rgba(255,255,255,0.1); margin: 5px 0;">
-                            <a href="#" class="submenu-item dropdown-trigger" style="font-weight: 600; color: #10b981;">CCS Menu <span>›</span></a>
-                            <ul class="submenu" style="display: none; padding-left: 15px; background: rgba(0,0,0,0.1);">
-                                <li><a href="bcs.html" class="submenu-item">• Bcs</a></li>
-                                <li><a href="ccs-branded.html" class="submenu-item">• Ccs branded</a></li>
-                                <li><a href="ccs-generik.html" class="submenu-item">• Ccs generik</a></li>
+                    <ul class="submenu" style="display: none; background-color: #1e293b;"> <li><a href="pk.html" class="submenu-item">PK</a></li>
+                        
+                        <li class="menu-item-wrapper" style="margin: 5px 0;">
+                            <a href="#" class="submenu-item dropdown-trigger" style="font-weight: 600; color: #10b981; background-color: #0f172a; border-radius: 4px;">CCS Menu <span>›</span></a>
+                            <ul class="submenu" style="display: none; padding-left: 10px; background-color: #0f172a;"> <li><a href="bcs.html" class="submenu-item">Bcs</a></li>
+                                <li><a href="ccs-branded.html" class="submenu-item">Ccs branded</a></li>
+                                <li><a href="ccs-generik.html" class="submenu-item">Ccs generik</a></li>
                             </ul>
                         </li>
+
                         <li><a href="kmo.html" class="submenu-item">KMO</a></li>
                         <li><a href="usi-oral.html" class="submenu-item">USI - Oral / Indeks</a></li>
                         <li><a href="generik.html" class="submenu-item">Generik</a></li>
@@ -37,7 +36,7 @@ class SideBar extends HTMLElement {
 
                 <li class="menu-item-wrapper">
                     <a href="#" class="menu-item dropdown-trigger">Akun + Kunjungan <span>›</span></a>
-                    <ul class="submenu" style="display: none;">
+                    <ul class="submenu" style="display: none; background-color: #1e293b;">
                         <li><a href="kunjungan-akun.html" class="submenu-item">Kunjungan (Akun)</a></li>
                         <li><a href="tambah-alamat.html" class="submenu-item">Tambah Alamat ID</a></li>
                         <li><a href="buat-alamat.html" class="submenu-item">Buat Alamat ID</a></li>
@@ -69,7 +68,7 @@ class SideBar extends HTMLElement {
         triggers.forEach(t => {
             t.onclick = (e) => {
                 e.preventDefault();
-                e.stopPropagation(); // Mencegah bentrokan antar menu bertingkat
+                e.stopPropagation();
                 const sub = t.nextElementSibling;
                 if (sub) {
                     sub.style.display = (sub.style.display === 'block') ? 'none' : 'block';
@@ -81,7 +80,6 @@ class SideBar extends HTMLElement {
         this.querySelectorAll('a').forEach(link => {
             if (link.getAttribute('href') === current) {
                 link.classList.add('active');
-                // Membuka semua parent menu jika halaman aktif ada di dalam sub-menu
                 let parent = link.closest('.submenu');
                 while (parent) {
                     parent.style.display = 'block';
