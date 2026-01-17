@@ -1,29 +1,10 @@
 class SideBar extends HTMLElement {
     connectedCallback() {
         this.innerHTML = `
-        <style>
-            /* Memastikan sidebar memiliki sistem flex untuk mendorong footer ke bawah */
-            .sidebar {
-                display: flex !important;
-                flex-direction: column !important;
-                height: 100vh !important; /* Full tinggi layar */
-                position: fixed;
-                left: 0;
-                top: 0;
-                overflow-y: auto;
-            }
-            .sidebar-footer {
-                margin-top: auto; /* Dorong ke paling bawah */
-                padding: 20px;
-                border-top: 1px solid rgba(255,255,255,0.1);
-                background: rgba(0,0,0,0.1);
-            }
-        </style>
-
-        <div class="sidebar">
+        <div class="sidebar" style="display: flex; flex-direction: column; height: 100vh;">
             <div class="sidebar-header">ONLINE SYSTEM SAMARINDA</div>
             
-            <ul class="menu-list">
+            <ul class="menu-list" style="flex: 1; overflow-y: auto;">
                 <li><a href="index.html" class="menu-item">Pengumuman!!</a></li>
 
                 <li class="menu-item-wrapper">
@@ -64,18 +45,35 @@ class SideBar extends HTMLElement {
                 <li><a href="ppf.html" class="menu-item">PPF 2026</a></li>
             </ul>
 
-            <div class="sidebar-footer">
-                <p style="margin: 0; font-size: 0.7rem; color: #94a3b8;">&copy; 2026 Online System</p>
-                <p style="margin: 5px 0 0 0; font-size: 0.75rem; color: #94a3b8;">Created by <span style="color: #10b981; font-weight: 600;">Whisper</span></p>
+            <div style="padding: 15px 20px; border-top: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.05); shrink: 0;">
+                <p style="margin: 0; font-size: 0.7rem; color: #94a3b8; opacity: 0.8;">&copy; 2026 Online System</p>
+                <p style="margin: 4px 0 0 0; font-size: 0.75rem; color: #94a3b8;">Created by <span style="color: #10b981; font-weight: 600;">Whisper</span></p>
             </div>
         </div>
         `;
 
         this.setActiveMenu();
+        this.setupSubmenus(); // Tambahkan ini agar dropdown berfungsi lagi
+    }
+
+    setupSubmenus() {
+        // Logika agar dropdown menu bisa diklik setelah dirender
+        const wrappers = this.querySelectorAll('.menu-item-wrapper > .menu-item');
+        wrappers.forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.preventDefault();
+                const submenu = item.nextElementSibling;
+                if (submenu) {
+                    const isVisible = submenu.style.display === 'block';
+                    submenu.style.display = isVisible ? 'none' : 'block';
+                }
+            });
+        });
     }
 
     setActiveMenu() {
-        const currentPage = window.location.pathname.split("/").pop() || "index.html";
+        const path = window.location.pathname;
+        const currentPage = path.split("/").pop() || "index.html";
         const links = this.querySelectorAll('a');
         links.forEach(link => {
             if (link.getAttribute('href') === currentPage) {
@@ -90,5 +88,3 @@ class SideBar extends HTMLElement {
 }
 
 customElements.define('main-sidebar', SideBar);
-
-
