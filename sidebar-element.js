@@ -32,7 +32,7 @@ class SideBar extends HTMLElement {
                         </li>
 
                         <li><a href="kmo.html" class="submenu-item">KMO</a></li>
-                        <li><a href="usi-oral.html" class="submenu-item">USI - Oral <span>›</span></a></li>
+                        <li><a href="#" class="submenu-item dropdown-trigger" style="font-weight: 600; color: #10b981;>USI - Oral <span>›</span></a></li>
                             <ul class="submenu" style="display: none; background-color: #f8fafc; border-left: 2px solid #10b981;">
                                 <li><a href="bcs.html" class="submenu-item">Rekap USI Rayon</a></li>
                                 <li><a href="ccs-branded.html" class="submenu-item">Buat USI Langsung</a></li>
