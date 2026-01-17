@@ -41,7 +41,7 @@ class SideBar extends HTMLElement {
                 <li><a href="hitung-sales.html" class="menu-item" id="nav-hitung">Hitung Sales</a></li>
                 <li><a href="cuti.html" class="menu-item" style="color: #ef4444; font-weight: 700;">Cuti-Cuti !!!</a></li>
                 <li><a href="bku.html" class="menu-item">BKU</a></li>
-                <li><a href="ppf.html" class="menu-item">PPF</a></li>
+                <li><a href="ppf.html" class="menu-item">PPF 2026</a></li>
             </ul>
         </div>
         `;
