@@ -341,3 +341,9 @@ header {
     font-family: 'Courier New', Courier, monospace; /* Font angka agar sejajar */
     font-weight: 600;
 }
+
+.sidebar {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
