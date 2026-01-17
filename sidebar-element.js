@@ -21,7 +21,14 @@ class SideBar extends HTMLElement {
                     <a href="#" class="menu-item dropdown-trigger">Administrasi <span>›</span></a>
                     <ul class="submenu" style="display: none;">
                         <li><a href="pk.html" class="submenu-item">PK</a></li>
-                        <li><a href="ccs.html" class="submenu-item">CCS</a></li>
+                        <li class="menu-item-wrapper" style="padding-left: 10px; border-left: 1px solid rgba(255,255,255,0.1); margin: 5px 0;">
+                            <a href="#" class="submenu-item dropdown-trigger" style="font-weight: 600; color: #10b981;">CCS Menu <span>›</span></a>
+                            <ul class="submenu" style="display: none; padding-left: 15px; background: rgba(0,0,0,0.1);">
+                                <li><a href="bcs.html" class="submenu-item">• Bcs</a></li>
+                                <li><a href="ccs-branded.html" class="submenu-item">• Ccs branded</a></li>
+                                <li><a href="ccs-generik.html" class="submenu-item">• Ccs generik</a></li>
+                            </ul>
+                        </li>
                         <li><a href="kmo.html" class="submenu-item">KMO</a></li>
                         <li><a href="usi-oral.html" class="submenu-item">USI - Oral / Indeks</a></li>
                         <li><a href="generik.html" class="submenu-item">Generik</a></li>
@@ -45,7 +52,7 @@ class SideBar extends HTMLElement {
                 <li><a href="ppf.html" class="menu-item">PPF 2026</a></li>
             </ul>
 
-            <div style="padding: 20px; border-top: 1px solid rgba(255,255,255,0.1); margin-top: 30px; text-align: left;">
+            <div style="padding: 20px; border-top: 1px solid rgba(255,255,255,0.1); margin-top: 30px;">
                 <p style="margin: 0; font-size: 0.65rem; color: #94a3b8; opacity: 0.7;">&copy; 2026 ONLINE SYSTEM</p>
                 <p style="margin: 5px 0 0 0; font-size: 0.8rem; color: #fff;">
                     Created by <span style="color: #10b981; font-weight: 600;">Whisper</span>
@@ -58,23 +65,28 @@ class SideBar extends HTMLElement {
     }
 
     init() {
-        // Logika Dropdown
         const triggers = this.querySelectorAll('.dropdown-trigger');
         triggers.forEach(t => {
             t.onclick = (e) => {
                 e.preventDefault();
+                e.stopPropagation(); // Mencegah bentrokan antar menu bertingkat
                 const sub = t.nextElementSibling;
-                sub.style.display = (sub.style.display === 'block') ? 'none' : 'block';
+                if (sub) {
+                    sub.style.display = (sub.style.display === 'block') ? 'none' : 'block';
+                }
             };
         });
 
-        // Logika Active State
         const current = window.location.pathname.split("/").pop() || "index.html";
         this.querySelectorAll('a').forEach(link => {
             if (link.getAttribute('href') === current) {
                 link.classList.add('active');
-                const p = link.closest('.submenu');
-                if (p) p.style.display = 'block';
+                // Membuka semua parent menu jika halaman aktif ada di dalam sub-menu
+                let parent = link.closest('.submenu');
+                while (parent) {
+                    parent.style.display = 'block';
+                    parent = parent.parentElement.closest('.submenu');
+                }
             }
         });
     }
